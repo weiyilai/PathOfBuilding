@@ -2809,7 +2809,7 @@ function ItemsTabClass:CorruptDisplayItem(modType)
 			controls.save.y = 99
 		end
 		if controls.sort then
-			applySort(controls.sort.list[controls.sort.selIndex].stat)
+			applySort(controls.sort.list[controls.sort.selIndex].stat, true)
 		else
 			buildList(controls.implicit, controls.implicit2, currentModType)
 			buildList(controls.implicit2, controls.implicit, currentModType)
@@ -3163,7 +3163,7 @@ function ItemsTabClass:AddCustomModifierToDisplayItem()
 		buildMods(value.sourceId)
 		controls.modSelect:SetSel(1)
 		if controls.sort then
-			applySort(controls.sort.list[controls.sort.selIndex].stat)
+			applySort(controls.sort.list[controls.sort.selIndex].stat, true)
 		end
 	end)
 	controls.source.enabled = #sourceList > 1
