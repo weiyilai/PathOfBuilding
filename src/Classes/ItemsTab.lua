@@ -1272,11 +1272,6 @@ function ItemsTabClass:Draw(viewPort, inputEvents)
 		if event.type == "KeyDown" then	
 			if event.key == "v" and IsKeyDown("CTRL") then
 				local newItem = Paste()
-				if newItem:find("{ ", 0, true) then
-					main:OpenConfirmPopup("Warning", "\"Advanced Item Descriptions\" (Ctrl+Alt+c) are unsupported.\n\nAbort paste?", "OK", function()
-						self:SetDisplayItem()
-					end)
-				end
 				if newItem then
 					self:CreateDisplayItemFromRaw(newItem, true)
 				end
@@ -1939,7 +1934,13 @@ function ItemsTabClass:UpdateAffixControl(control, item, type, outputTable, outp
 	end
 	if control.list[control.selIndex].haveRange then
 		control.slider.divCount = #control.list[control.selIndex].modList
-		control.slider.val = (isValueInArray(control.list[control.selIndex].modList, selAffix) - 1 + (item[outputTable][outputIndex].range or 0.5)) / control.slider.divCount
+		local index = isValueInArray(control.list[control.selIndex].modList, selAffix)
+		local range = item[outputTable][outputIndex].range or 0.5
+		-- Avoid exact integer boundary that slider:GetDivVal's ceil would assign to the previous segment
+		if range == 0 and index > 1 then
+			range = 1e-4
+		end
+		control.slider.val = (index - 1 + range) / control.slider.divCount
 		if control.slider.divCount == 1 then
 			control.slider.divCount = nil
 		end
@@ -3221,30 +3222,9 @@ function ItemsTabClass:AddCrucibleModifierToDisplayItem()
 		end
 		return table.concat(label, "/")
 	end
-	local function itemCanHaveMod(mod)
-		local keyMap, includeTags = { }, { }
-		for index, key in ipairs(mod.weightKey) do
-			keyMap[key] = index
-		end
-		-- check for uniques with off-tag mods
-		if data.casterTagCrucibleUniques[self.displayItem.title] then
-			includeTags["caster_unique_weapon"] = true
-		end
-		if data.minionTagCrucibleUniques[self.displayItem.title] then
-			includeTags["minion_unique_weapon"] = true
-		end
-		if self.displayItem.canHaveOnlySupportSkillsCrucibleTree then
-			 return keyMap["crucible_unique_staff"] and mod.weightVal[keyMap["crucible_unique_staff"]] ~= 0
-		elseif self.displayItem.canHaveShieldCrucibleTree then
-			return self.displayItem:GetModSpawnWeight(mod, { ["crucible_unique_helmet"] = true, ["shield"] = true }) > 0
-		elseif self.displayItem.canHaveTwoHandedSwordCrucibleTree then
-			return self.displayItem:GetModSpawnWeight(mod, { ["two_hand_weapon"] = true }, { ["one_hand_weapon"] = true }) > 0
-		end
-		return self.displayItem:GetModSpawnWeight(mod, includeTags) > 0
-	end
 	local function buildCrucibleMods()
 		for i, mod in pairs(self.build.data.crucible) do
-			if itemCanHaveMod(mod) then
+			if self.displayItem:CanHaveMod(mod) then
 				-- item mod must match the whole mod, whether that's one line or two
 				if itemModMap[checkLineForAllocates(mod[1], self.build.spec.nodes)] and ((mod[2] and itemModMap[checkLineForAllocates(mod[2], self.build.spec.nodes)]) or not mod[2]) then
 					-- for multi nodes, if the first location is taken, use second
