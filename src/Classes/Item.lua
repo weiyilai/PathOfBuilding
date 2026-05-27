@@ -12,7 +12,7 @@ local m_floor = math.floor
 
 local dmgTypeList = {"Physical", "Lightning", "Cold", "Fire", "Chaos"}
 local catalystList = {"Abrasive", "Accelerating", "Dextral", "Fertile", "Imbued", "Intrinsic", "Noxious", "Prismatic", "Sinistral", "Tempering", "Turbulent", "Unstable"}
-local catalystDescriptorList = {"Attack", "Speed", "Suffix", "Life and Mana", "Caster", "Attribute", "Physical and Chaos", "Resistance", "Prefix", "Defense", "Elemental", "Critical"}
+local catalystDescriptorList = {"Attack", "Speed", "Suffix", "Life and Mana", "Caster", "Attribute", "Physical and Chaos", "Resistance", "Prefix", "Defence", "Elemental", "Critical"}
 local catalystTags = {
 	{ "attack" },
 	{ "speed" },
