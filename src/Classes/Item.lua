@@ -418,6 +418,9 @@ function ItemClass:ParseRaw(raw, rarity, highQuality)
 			-- nothing to do
 		elseif line:match("^%(%a+") then
 			-- Reminder text, nothing to parse
+			while self.rawLines[l] and not self.rawLines[l]:match("%)$") do
+				l = l + 1
+			end
 		elseif line:match("^{ ") then
 			-- We're parsing advanced copy/paste format
 			linePrefix = ""
